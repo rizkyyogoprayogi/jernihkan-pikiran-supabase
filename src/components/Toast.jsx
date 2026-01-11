@@ -21,7 +21,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
     }
 
     return (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] animate-fade-in-down w-full max-w-sm px-4">
+        <div className="fixed top-4 sm:top-6 inset-x-0 mx-auto z-[100] animate-fade-in-down w-[90%] max-w-md px-2 sm:px-4">
             <div className={`${styles[type]} shadow-2xl rounded-2xl p-4 border flex items-center gap-3 relative overflow-hidden backdrop-blur-xl bg-opacity-95`}>
                 {/* Glow effect */}
                 <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none" />
