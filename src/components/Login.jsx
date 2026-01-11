@@ -79,6 +79,10 @@ export default function Login() {
                     </div>
                 </div>
             </div>
+
+            <footer className="absolute bottom-4 text-center text-slate-400 text-xs font-medium">
+                created by <a href="https://upbright.web.id" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">upbright.web.id</a>
+            </footer>
         </div>
     )
 }

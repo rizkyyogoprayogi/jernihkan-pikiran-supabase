@@ -3,7 +3,9 @@ import { supabase } from './lib/supabaseClient'
 import Login from './components/Login'
 import ThoughtForm from './components/ThoughtForm'
 import Reflection from './components/Reflection'
-import { Sparkles, Brain, LogOut } from 'lucide-react'
+import Sidebar from './components/Sidebar'
+import Toast from './components/Toast'
+import { Sparkles, Brain, LogOut, Menu, History } from 'lucide-react'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -11,6 +13,12 @@ function App() {
   const [view, setView] = useState('INPUT') // 'INPUT' | 'REFLECTION'
   const [currentThoughtId, setCurrentThoughtId] = useState(null)
   const [processing, setProcessing] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [toast, setToast] = useState(null) // { message, type }
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+  }
 
   useEffect(() => {
     if (!supabase) {
@@ -73,20 +81,23 @@ function App() {
         setView('REFLECTION')
       }
     } catch (error) {
-      alert('Error saving thought: ' + (error.message || error.error_description))
+      showToast('Error saving thought: ' + (error.message || error.error_description), 'error')
     } finally {
       setProcessing(false)
     }
   }
 
-  const handleDecision = async (isImportant) => {
+  const handleDecision = async (isImportant, explanation) => {
     setProcessing(true)
     try {
       if (!currentThoughtId) return
 
       const { error } = await supabase
         .from('thoughts')
-        .update({ is_important: isImportant })
+        .update({
+          is_important: isImportant,
+          explanation: explanation
+        })
         .eq('id', currentThoughtId)
 
       if (error) throw error
@@ -94,9 +105,13 @@ function App() {
       // Reset flow
       setView('INPUT')
       setCurrentThoughtId(null)
-      alert(isImportant ? 'Disimpan sebagai hal penting.' : 'Dilepaskan. Pikiranmu sekarang lebih jernih.')
+      showToast(isImportant ? 'Disimpan: Ayo Lakukan!' : 'Dilepaskan: Pikiranmu lebih jernih.', 'success')
+
+      // Open sidebar to show history after completing a thought
+      setIsSidebarOpen(true)
+
     } catch (error) {
-      alert('Error updating thought: ' + error.message)
+      showToast('Error updating thought: ' + error.message, 'error')
     } finally {
       setProcessing(false)
     }
@@ -115,9 +130,23 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/50 relative overflow-x-hidden">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        session={session}
+      />
+
       {/* Header */}
-      <header className="bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-50">
+      <header className="bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm">
@@ -126,8 +155,18 @@ function App() {
             <span className="font-bold text-slate-800 tracking-tight hidden sm:block">Jernihkan Pikiran</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-500 hidden sm:block">{session.user.email}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center gap-2"
+              title="Riwayat"
+            >
+              <History className="w-5 h-5" />
+              <span className="text-sm font-medium hidden sm:block">Riwayat</span>
+            </button>
+
+            <div className="h-6 w-px bg-slate-200 mx-1"></div>
+
             <button
               onClick={() => supabase.auth.signOut()}
               className="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
@@ -143,7 +182,7 @@ function App() {
       <main className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
-            {view === 'INPUT' ? 'Renungkan Harimu' : 'Ambil Keputusan'}
+            {view === 'INPUT' ? 'Jernihkan Pikiranmu' : 'Ambil Keputusan'}
           </h1>
           <p className="text-lg text-slate-500 font-medium">
             Think Clear to Get Clarity Way
@@ -171,6 +210,10 @@ function App() {
           </div>
         </div>
       </main>
+
+      <footer className="py-6 text-center text-slate-400 text-sm font-medium">
+        created by <a href="https://upbright.web.id" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">upbright.web.id</a>
+      </footer>
     </div>
   )
 }
