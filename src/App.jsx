@@ -25,10 +25,32 @@ function App() {
       setLoading(false)
       return
     }
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
+    // Check for hash in URL (Manual handling for redirection issues)
+    const handleHashSession = async () => {
+      const hash = window.location.hash
+      if (hash && hash.includes('access_token')) {
+        try {
+          const { data: { session }, error } = await supabase.auth.getSession()
+          if (session) {
+            setSession(session)
+            setLoading(false)
+            // Clear hash to clean URL
+            window.history.replaceState(null, '', window.location.pathname)
+            return
+          }
+        } catch (e) {
+          console.error("Manual hash parsing failed", e)
+        }
+      }
+
+      // Fallback: Standard check
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session)
+        setLoading(false)
+      })
+    }
+
+    handleHashSession()
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
