@@ -28,22 +28,40 @@ function App() {
     // Check for hash in URL (Manual handling for redirection issues)
     const handleHashSession = async () => {
       const hash = window.location.hash
-      if (hash && hash.includes('access_token')) {
+
+      // If hash contains token info, manually parse and set session
+      if (hash && hash.includes('access_token') && hash.includes('refresh_token')) {
+        console.log('Detected OAuth tokens in URL hash - attempting manual session setup')
         try {
-          const { data: { session }, error } = await supabase.auth.getSession()
-          if (session) {
-            setSession(session)
-            setLoading(false)
-            // Clear hash to clean URL
-            window.history.replaceState(null, '', window.location.pathname)
-            return
+          // Parse hash parameters manually
+          const params = new URLSearchParams(hash.substring(1))
+          const access_token = params.get('access_token')
+          const refresh_token = params.get('refresh_token')
+
+          if (access_token && refresh_token) {
+            // Force set the session with the tokens we parsed
+            const { data, error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token
+            })
+
+            if (!error && data.session) {
+              console.log('Manual setSession succeeded!')
+              setSession(data.session)
+              setLoading(false)
+              // Clear hash to clean URL
+              window.history.replaceState(null, '', window.location.pathname)
+              return
+            } else {
+              console.error('setSession failed:', error)
+            }
           }
         } catch (e) {
-          console.error("Manual hash parsing failed", e)
+          console.error("Manual token parsing failed", e)
         }
       }
 
-      // Fallback: Standard check
+      // Fallback: Standard session check
       supabase.auth.getSession().then(({ data: { session } }) => {
         setSession(session)
         setLoading(false)
