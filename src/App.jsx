@@ -26,12 +26,6 @@ function App() {
       return
     }
 
-    // DEBUG: Check initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('getSession result:', { session, error })
-      setSession(session)
-      setLoading(false)
-    })
 
     const {
       data: { subscription },
