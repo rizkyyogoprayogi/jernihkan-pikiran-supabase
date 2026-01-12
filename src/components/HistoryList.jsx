@@ -77,9 +77,14 @@ export default function HistoryList({ session }) {
 
                     <div className="pl-3">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-2xl" role="img" aria-label={thought.emotion}>
-                                {getEmotionEmoji(thought.emotion)}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-2xl" role="img" aria-label={thought.emotion}>
+                                    {getEmotionEmoji(thought.emotion)}
+                                </span>
+                                <span className="text-sm font-medium text-slate-600 capitalize">
+                                    {thought.emotion}
+                                </span>
+                            </div>
                             <span className="text-xs text-slate-400 font-mono">
                                 {formatDate(thought.created_at)}
                             </span>

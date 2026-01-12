@@ -21,25 +21,27 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
     }
 
     return (
-        <div className="fixed top-4 sm:top-6 inset-x-0 mx-auto z-[100] animate-fade-in-down w-[90%] max-w-md px-2 sm:px-4">
-            <div className={`${styles[type]} shadow-2xl rounded-2xl p-4 border flex items-center gap-3 relative overflow-hidden backdrop-blur-xl bg-opacity-95`}>
-                {/* Glow effect */}
-                <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none" />
+        <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center pt-4 sm:pt-6 pointer-events-none px-4">
+            <div className="animate-fade-in-down w-full max-w-md pointer-events-auto">
+                <div className={`${styles[type]} shadow-2xl rounded-2xl p-4 border flex items-center gap-3 relative overflow-hidden backdrop-blur-xl bg-opacity-95`}>
+                    {/* Glow effect */}
+                    <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none" />
 
-                <div className="flex-shrink-0">
-                    {icons[type]}
+                    <div className="flex-shrink-0">
+                        {icons[type]}
+                    </div>
+
+                    <p className="flex-1 font-medium text-sm leading-snug">
+                        {message}
+                    </p>
+
+                    <button
+                        onClick={onClose}
+                        className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                    >
+                        <X className="w-4 h-4 opacity-70" />
+                    </button>
                 </div>
-
-                <p className="flex-1 font-medium text-sm leading-snug">
-                    {message}
-                </p>
-
-                <button
-                    onClick={onClose}
-                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
-                >
-                    <X className="w-4 h-4 opacity-70" />
-                </button>
             </div>
         </div>
     )
