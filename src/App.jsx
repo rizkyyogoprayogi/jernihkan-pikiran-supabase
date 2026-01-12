@@ -26,7 +26,9 @@ function App() {
       return
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // DEBUG: Check initial session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('getSession result:', { session, error })
       setSession(session)
       setLoading(false)
     })
@@ -34,6 +36,7 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('onAuthStateChange:', _event, session?.user?.email)
       setSession(session)
       setLoading(false)
     })
