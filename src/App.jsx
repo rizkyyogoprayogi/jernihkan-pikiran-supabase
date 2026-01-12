@@ -25,24 +25,13 @@ function App() {
       setLoading(false)
       return
     }
-
-    // DEBUG: Check Environment & Session
-    console.log('App Mount - Device Time:', new Date().toString())
-    console.log('App Mount - URL:', window.location.href)
-
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('getSession result:', { session, error })
-      if (error?.message?.includes('future')) {
-        console.error('CRITICAL: Clock Skew detected! Device time is behind server.')
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('onAuthStateChange:', _event)
       setSession(session)
       setLoading(false)
     })
