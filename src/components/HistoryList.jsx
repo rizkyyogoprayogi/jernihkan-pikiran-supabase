@@ -77,11 +77,20 @@ export default function HistoryList({ session }) {
 
                     <div className="pl-3">
                         <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                                <span className="text-2xl" role="img" aria-label={thought.emotion}>
+                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${thought.emotion === 'marah' ? 'bg-red-100 text-red-700' :
+                                    thought.emotion === 'sedih' ? 'bg-blue-100 text-blue-700' :
+                                        thought.emotion === 'bingung' ? 'bg-purple-100 text-purple-700' :
+                                            thought.emotion === 'kesal' ? 'bg-orange-100 text-orange-700' :
+                                                thought.emotion === 'muak' ? 'bg-green-100 text-green-700' :
+                                                    thought.emotion === 'jijik' ? 'bg-teal-100 text-teal-700' :
+                                                        thought.emotion === 'senang' ? 'bg-yellow-100 text-yellow-700' :
+                                                            thought.emotion === 'gembira' ? 'bg-pink-100 text-pink-700' :
+                                                                'bg-slate-100 text-slate-700'
+                                }`}>
+                                <span className="text-lg" role="img" aria-label={thought.emotion}>
                                     {getEmotionEmoji(thought.emotion)}
                                 </span>
-                                <span className="text-sm font-medium text-slate-600 capitalize">
+                                <span className="text-xs font-semibold capitalize">
                                     {thought.emotion}
                                 </span>
                             </div>
