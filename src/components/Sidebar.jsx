@@ -1,10 +1,19 @@
 import { useState } from 'react'
-import { X, Clock, BarChart3 } from 'lucide-react'
+import { X, Clock, BarChart3, RefreshCw } from 'lucide-react'
 import HistoryList from './HistoryList'
 import Statistics from './Statistics'
 
 export default function Sidebar({ isOpen, onClose, session }) {
     const [activeTab, setActiveTab] = useState('history') // 'history' | 'stats'
+    const [refreshKey, setRefreshKey] = useState(0)
+    const [isRefreshing, setIsRefreshing] = useState(false)
+
+    const handleRefresh = () => {
+        setIsRefreshing(true)
+        setRefreshKey(prev => prev + 1)
+        // Reset animation after 500ms
+        setTimeout(() => setIsRefreshing(false), 500)
+    }
 
     return (
         <>
@@ -26,12 +35,22 @@ export default function Sidebar({ isOpen, onClose, session }) {
                         <h2 className="text-lg font-bold text-slate-800">
                             {activeTab === 'history' ? 'Riwayat Pikiran' : 'Statistik'}
                         </h2>
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={handleRefresh}
+                                className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                title="Refresh Data"
+                            >
+                                <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
+                                title="Tutup"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Tabs */}
@@ -39,8 +58,8 @@ export default function Sidebar({ isOpen, onClose, session }) {
                         <button
                             onClick={() => setActiveTab('history')}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${activeTab === 'history'
-                                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                 }`}
                         >
                             <Clock className="w-4 h-4" />
@@ -49,8 +68,8 @@ export default function Sidebar({ isOpen, onClose, session }) {
                         <button
                             onClick={() => setActiveTab('stats')}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${activeTab === 'stats'
-                                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                 }`}
                         >
                             <BarChart3 className="w-4 h-4" />
@@ -61,9 +80,9 @@ export default function Sidebar({ isOpen, onClose, session }) {
                     {/* Content */}
                     <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                         {activeTab === 'history' ? (
-                            <HistoryList session={session} />
+                            <HistoryList session={session} key={`history-${refreshKey}`} />
                         ) : (
-                            <Statistics session={session} />
+                            <Statistics session={session} key={`stats-${refreshKey}`} />
                         )}
                     </div>
                 </div>
@@ -71,4 +90,3 @@ export default function Sidebar({ isOpen, onClose, session }) {
         </>
     )
 }
-
