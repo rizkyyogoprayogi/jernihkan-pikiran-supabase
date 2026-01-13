@@ -156,15 +156,6 @@ export default function HistoryList({ session }) {
                             thought.is_important === false ? 'bg-emerald-400' : 'bg-slate-200'
                             }`} />
 
-                        {/* Delete Button */}
-                        <button
-                            onClick={() => setDeleteModal({ open: true, thought })}
-                            className="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                            title="Hapus"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
-
                         <div className="pl-3">
                             <div className="flex items-center justify-between mb-2">
                                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${thought.emotion === 'marah' ? 'bg-red-100 text-red-700' :
@@ -184,9 +175,18 @@ export default function HistoryList({ session }) {
                                         {thought.emotion}
                                     </span>
                                 </div>
-                                <span className="text-xs text-slate-400 font-mono">
-                                    {formatDate(thought.created_at)}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-slate-400 font-mono">
+                                        {formatDate(thought.created_at)}
+                                    </span>
+                                    <button
+                                        onClick={() => setDeleteModal({ open: true, thought })}
+                                        className="p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded transition-all opacity-0 group-hover:opacity-100"
+                                        title="Hapus"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                             </div>
 
                             <p className="text-slate-700 text-sm line-clamp-3 mb-3">
