@@ -49,9 +49,19 @@ export default function Statistics({ session }) {
     const stats = useMemo(() => {
         if (thoughts.length === 0) return null
 
-        // Emotion breakdown
+        // Get date 7 days ago
+        const today = new Date()
+        const sevenDaysAgo = new Date(today)
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        // Filter thoughts from last 7 days
+        const weeklyThoughts = thoughts.filter(t =>
+            new Date(t.created_at) >= sevenDaysAgo
+        )
+
+        // Emotion breakdown (7 days only)
         const emotionCounts = {}
-        thoughts.forEach(t => {
+        weeklyThoughts.forEach(t => {
             emotionCounts[t.emotion] = (emotionCounts[t.emotion] || 0) + 1
         })
         const emotionData = Object.entries(emotionCounts).map(([name, value]) => ({
@@ -60,12 +70,11 @@ export default function Statistics({ session }) {
             emoji: EMOTION_EMOJIS[name] || '😐'
         })).sort((a, b) => b.value - a.value)
 
-        // Decision summary
-        const important = thoughts.filter(t => t.is_important === true).length
-        const released = thoughts.filter(t => t.is_important === false).length
+        // Decision summary (7 days only)
+        const important = weeklyThoughts.filter(t => t.is_important === true).length
+        const released = weeklyThoughts.filter(t => t.is_important === false).length
 
         // Weekly data (last 7 days)
-        const today = new Date()
         const weeklyData = []
         for (let i = 6; i >= 0; i--) {
             const date = new Date(today)
@@ -80,16 +89,17 @@ export default function Statistics({ session }) {
             })
         }
 
-        // Top emotion insight
-        const topEmotion = emotionData[0]
+        // Top emotion insight (from weekly data)
+        const topEmotion = emotionData.length > 0 ? emotionData[0] : null
 
         return {
             emotionData,
             important,
             released,
-            total: thoughts.length,
+            total: weeklyThoughts.length,
             weeklyData,
-            topEmotion
+            topEmotion,
+            hasWeeklyData: weeklyThoughts.length > 0
         }
     }, [thoughts])
 
@@ -115,14 +125,21 @@ export default function Statistics({ session }) {
         <div className="space-y-6 pb-20">
             {/* Top Insight Card */}
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-4 text-white shadow-lg">
-                <div className="flex items-center gap-2 mb-2">
-                    <Lightbulb className="w-5 h-5" />
-                    <span className="font-semibold text-sm">Insight Utama</span>
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5" />
+                        <span className="font-semibold text-sm">Insight Utama</span>
+                    </div>
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">7 Hari Terakhir</span>
                 </div>
-                <p className="text-lg">
-                    Emosi paling sering: <span className="font-bold">{stats.topEmotion.emoji} {stats.topEmotion.name}</span>
-                    <span className="text-blue-100 text-sm ml-2">({stats.topEmotion.value}x)</span>
-                </p>
+                {stats.topEmotion ? (
+                    <p className="text-lg">
+                        Emosi paling sering: <span className="font-bold">{stats.topEmotion.emoji} {stats.topEmotion.name}</span>
+                        <span className="text-blue-100 text-sm ml-2">({stats.topEmotion.value}x)</span>
+                    </p>
+                ) : (
+                    <p className="text-blue-100 text-sm">Belum ada data minggu ini</p>
+                )}
             </div>
 
             {/* Decision Summary */}
