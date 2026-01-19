@@ -189,7 +189,7 @@ export default function HistoryList({ session }) {
                                 </div>
                             </div>
 
-                            <p className="text-slate-700 text-sm line-clamp-3 mb-3">
+                            <p className="text-slate-700 text-sm mb-3">
                                 {thought.content}
                             </p>
 
