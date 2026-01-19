@@ -55,6 +55,7 @@ export default function HistoryList({ session }) {
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
+            weekday: 'long',
             day: 'numeric',
             month: 'short',
             year: '2-digit',
