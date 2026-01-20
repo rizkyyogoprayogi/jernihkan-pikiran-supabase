@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { Clock, AlertCircle, CheckCircle2, Trash2, X } from 'lucide-react'
+import { Clock, AlertCircle, CheckCircle2, Trash2, X, ChevronDown } from 'lucide-react'
 
 export default function HistoryList({ session }) {
     const [thoughts, setThoughts] = useState([])
@@ -8,6 +8,8 @@ export default function HistoryList({ session }) {
     const [deleteModal, setDeleteModal] = useState({ open: false, thought: null })
     const [deleting, setDeleting] = useState(false)
     const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'important' | 'released'
+    const [visibleCount, setVisibleCount] = useState(10)
+    const ITEMS_PER_PAGE = 10
 
     useEffect(() => {
         fetchHistory()
@@ -156,8 +158,8 @@ export default function HistoryList({ session }) {
                 <button
                     onClick={() => setStatusFilter('all')}
                     className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-all ${statusFilter === 'all'
-                            ? 'bg-white text-slate-800 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
                         }`}
                 >
                     Semua
@@ -165,8 +167,8 @@ export default function HistoryList({ session }) {
                 <button
                     onClick={() => setStatusFilter('important')}
                     className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1 ${statusFilter === 'important'
-                            ? 'bg-white text-orange-600 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-orange-600 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
                         }`}
                 >
                     <AlertCircle className="w-3 h-3" />
@@ -175,8 +177,8 @@ export default function HistoryList({ session }) {
                 <button
                     onClick={() => setStatusFilter('released')}
                     className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1 ${statusFilter === 'released'
-                            ? 'bg-white text-emerald-600 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-emerald-600 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
                         }`}
                 >
                     <CheckCircle2 className="w-3 h-3" />
@@ -186,93 +188,119 @@ export default function HistoryList({ session }) {
 
             {/* Thoughts List */}
             <div className="space-y-3 pb-20">
-                {thoughts
-                    .filter(t => {
+                {(() => {
+                    const filteredThoughts = thoughts.filter(t => {
                         if (statusFilter === 'all') return true
                         if (statusFilter === 'important') return t.is_important === true
                         if (statusFilter === 'released') return t.is_important === false
                         return true
                     })
-                    .map((thought) => (
-                        <div
-                            key={thought.id}
-                            className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
-                        >
-                            {/* Status Indicator Stripe */}
-                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${thought.is_important === true ? 'bg-orange-400' :
-                                thought.is_important === false ? 'bg-emerald-400' : 'bg-slate-200'
-                                }`} />
+                    const visibleThoughts = filteredThoughts.slice(0, visibleCount)
+                    const hasMore = filteredThoughts.length > visibleCount
+                    const remaining = filteredThoughts.length - visibleCount
 
-                            <div className="pl-3">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${thought.emotion === 'marah' ? 'bg-red-100 text-red-700' :
-                                        thought.emotion === 'sedih' ? 'bg-blue-100 text-blue-700' :
-                                            thought.emotion === 'bingung' ? 'bg-purple-100 text-purple-700' :
-                                                thought.emotion === 'kesal' ? 'bg-orange-100 text-orange-700' :
-                                                    thought.emotion === 'muak' ? 'bg-green-100 text-green-700' :
-                                                        thought.emotion === 'jijik' ? 'bg-teal-100 text-teal-700' :
-                                                            thought.emotion === 'senang' ? 'bg-yellow-100 text-yellow-700' :
-                                                                thought.emotion === 'gembira' ? 'bg-pink-100 text-pink-700' :
-                                                                    'bg-slate-100 text-slate-700'
-                                        }`}>
-                                        <span className="text-lg" role="img" aria-label={thought.emotion}>
-                                            {getEmotionEmoji(thought.emotion)}
-                                        </span>
-                                        <span className="text-xs font-semibold capitalize">
-                                            {thought.emotion}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="text-right">
-                                            <div className="text-xs text-slate-500 font-medium">
-                                                {formatDate(thought.created_at).line1}
-                                            </div>
-                                            <div className="text-[10px] text-slate-400">
-                                                {formatDate(thought.created_at).line2}
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => setDeleteModal({ open: true, thought })}
-                                            className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
-                                            title="Hapus"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
+                    return (
+                        <>
+                            {visibleThoughts.length === 0 ? (
+                                <div className="text-center py-8 text-slate-400">
+                                    <p className="text-sm">Tidak ada pikiran dengan status ini.</p>
                                 </div>
+                            ) : (
+                                visibleThoughts.map((thought) => (
+                                    <div
+                                        key={thought.id}
+                                        className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+                                    >
+                                        {/* Status Indicator Stripe */}
+                                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${thought.is_important === true ? 'bg-orange-400' :
+                                            thought.is_important === false ? 'bg-emerald-400' : 'bg-slate-200'
+                                            }`} />
 
-                                <p className="text-slate-700 text-sm mb-3">
-                                    {thought.content}
-                                </p>
+                                        <div className="pl-3">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${thought.emotion === 'marah' ? 'bg-red-100 text-red-700' :
+                                                    thought.emotion === 'sedih' ? 'bg-blue-100 text-blue-700' :
+                                                        thought.emotion === 'bingung' ? 'bg-purple-100 text-purple-700' :
+                                                            thought.emotion === 'kesal' ? 'bg-orange-100 text-orange-700' :
+                                                                thought.emotion === 'muak' ? 'bg-green-100 text-green-700' :
+                                                                    thought.emotion === 'jijik' ? 'bg-teal-100 text-teal-700' :
+                                                                        thought.emotion === 'senang' ? 'bg-yellow-100 text-yellow-700' :
+                                                                            thought.emotion === 'gembira' ? 'bg-pink-100 text-pink-700' :
+                                                                                'bg-slate-100 text-slate-700'
+                                                    }`}>
+                                                    <span className="text-lg" role="img" aria-label={thought.emotion}>
+                                                        {getEmotionEmoji(thought.emotion)}
+                                                    </span>
+                                                    <span className="text-xs font-semibold capitalize">
+                                                        {thought.emotion}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="text-right">
+                                                        <div className="text-xs text-slate-500 font-medium">
+                                                            {formatDate(thought.created_at).line1}
+                                                        </div>
+                                                        <div className="text-[10px] text-slate-400">
+                                                            {formatDate(thought.created_at).line2}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setDeleteModal({ open: true, thought })}
+                                                        className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+                                                        title="Hapus"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                {thought.explanation && (
-                                    <div className="mb-3 p-2 bg-slate-50 rounded-lg border border-slate-100">
-                                        <p className="text-xs text-slate-500 font-medium mb-1">
-                                            {thought.is_important ? 'Alasan Penting:' : 'Alasan Melepaskan:'}
-                                        </p>
-                                        <p className="text-slate-600 text-xs italic">
-                                            "{thought.explanation}"
-                                        </p>
+                                            <p className="text-slate-700 text-sm mb-3">
+                                                {thought.content}
+                                            </p>
+
+                                            {thought.explanation && (
+                                                <div className="mb-3 p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                                    <p className="text-xs text-slate-500 font-medium mb-1">
+                                                        {thought.is_important ? 'Alasan Penting:' : 'Alasan Melepaskan:'}
+                                                    </p>
+                                                    <p className="text-slate-600 text-xs italic">
+                                                        "{thought.explanation}"
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center justify-end">
+                                                {thought.is_important === true && (
+                                                    <div className="flex items-center gap-1 text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">
+                                                        <AlertCircle className="w-3 h-3" />
+                                                        <span>Penting</span>
+                                                    </div>
+                                                )}
+                                                {thought.is_important === false && (
+                                                    <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full">
+                                                        <CheckCircle2 className="w-3 h-3" />
+                                                        <span>Selesai</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
+                                ))
+                            )}
 
-                                <div className="flex items-center justify-end">
-                                    {thought.is_important === true && (
-                                        <div className="flex items-center gap-1 text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">
-                                            <AlertCircle className="w-3 h-3" />
-                                            <span>Penting</span>
-                                        </div>
-                                    )}
-                                    {thought.is_important === false && (
-                                        <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full">
-                                            <CheckCircle2 className="w-3 h-3" />
-                                            <span>Selesai</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                            {/* Load More Button */}
+                            {hasMore && (
+                                <button
+                                    onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+                                    className="w-full mt-4 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-sm rounded-xl transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <ChevronDown className="w-4 h-4" />
+                                    Muat {remaining > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : remaining} lagi ({remaining} tersisa)
+                                </button>
+                            )}
+                        </>
+                    )
+                })()}
             </div>
         </>
     )
