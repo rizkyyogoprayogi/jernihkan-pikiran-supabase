@@ -54,14 +54,19 @@ export default function HistoryList({ session }) {
     }
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'short',
-            year: '2-digit',
+        const date = new Date(dateString)
+        const line1 = date.toLocaleDateString('id-ID', {
+            weekday: 'long'
+        }) + ', ' + date.toLocaleTimeString('id-ID', {
             hour: '2-digit',
             minute: '2-digit'
         })
+        const line2 = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        })
+        return { line1, line2 }
     }
 
     const getEmotionEmoji = (emotionId) => {
@@ -177,9 +182,14 @@ export default function HistoryList({ session }) {
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs text-slate-400 font-mono">
-                                        {formatDate(thought.created_at)}
-                                    </span>
+                                    <div className="text-right">
+                                        <div className="text-xs text-slate-500 font-medium">
+                                            {formatDate(thought.created_at).line1}
+                                        </div>
+                                        <div className="text-[10px] text-slate-400">
+                                            {formatDate(thought.created_at).line2}
+                                        </div>
+                                    </div>
                                     <button
                                         onClick={() => setDeleteModal({ open: true, thought })}
                                         className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
