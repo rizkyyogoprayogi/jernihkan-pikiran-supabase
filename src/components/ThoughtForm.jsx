@@ -36,7 +36,11 @@ export default function ThoughtForm({ onSubmit, isSubmitting }) {
         onSubmit({ emotion, content, intensity })
     }
 
-    const getIntensityColor = (value) => {
+    const getIntensityColor = (value, emotionType) => {
+        // Positive emotions are always green
+        if (emotionType === 'senang' || emotionType === 'gembira') {
+            return 'text-emerald-500'
+        }
         if (value <= 3) return 'text-emerald-500'
         if (value <= 5) return 'text-yellow-500'
         if (value <= 7) return 'text-orange-500'
@@ -81,7 +85,7 @@ export default function ThoughtForm({ onSubmit, isSubmitting }) {
                         <div className="flex items-center justify-between mb-3">
                             <span className="text-xs text-slate-400">Ringan</span>
                             <div className="text-center">
-                                <span className={`text-3xl font-bold ${getIntensityColor(intensity)}`}>
+                                <span className={`text-3xl font-bold ${getIntensityColor(intensity, emotion)}`}>
                                     {intensity}
                                 </span>
                                 <span className="text-slate-400 text-lg">/10</span>
@@ -96,7 +100,7 @@ export default function ThoughtForm({ onSubmit, isSubmitting }) {
                             onChange={(e) => setIntensity(parseInt(e.target.value))}
                             className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
                         />
-                        <p className={`text-center mt-2 text-sm font-medium ${getIntensityColor(intensity)}`}>
+                        <p className={`text-center mt-2 text-sm font-medium ${getIntensityColor(intensity, emotion)}`}>
                             {INTENSITY_LABELS[intensity]}
                         </p>
                     </div>

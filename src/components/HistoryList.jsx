@@ -236,10 +236,11 @@ export default function HistoryList({ session }) {
                                                     </span>
                                                 </div>
                                                 {thought.intensity && (
-                                                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${thought.intensity <= 3 ? 'bg-emerald-100 text-emerald-600' :
-                                                            thought.intensity <= 5 ? 'bg-yellow-100 text-yellow-600' :
-                                                                thought.intensity <= 7 ? 'bg-orange-100 text-orange-600' :
-                                                                    'bg-red-100 text-red-600'
+                                                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${(thought.emotion === 'senang' || thought.emotion === 'gembira') ? 'bg-emerald-100 text-emerald-600' :
+                                                            thought.intensity <= 3 ? 'bg-emerald-100 text-emerald-600' :
+                                                                thought.intensity <= 5 ? 'bg-yellow-100 text-yellow-600' :
+                                                                    thought.intensity <= 7 ? 'bg-orange-100 text-orange-600' :
+                                                                        'bg-red-100 text-red-600'
                                                         }`}>
                                                         <span>{thought.intensity}/10</span>
                                                     </div>
