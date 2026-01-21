@@ -269,18 +269,28 @@ export default function HistoryList({ session }) {
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center justify-end">
+                                            <div className="flex items-center justify-end gap-2 flex-wrap">
                                                 {thought.is_important === true && (
-                                                    <div className="flex items-center gap-1 text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">
-                                                        <AlertCircle className="w-3 h-3" />
-                                                        <span>Penting</span>
-                                                    </div>
+                                                    <>
+                                                        <div className="flex items-center gap-1 text-xs text-blue-500 font-medium bg-blue-50 px-2 py-1 rounded-full">
+                                                            <span>Dalam kendaliku</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">
+                                                            <AlertCircle className="w-3 h-3" />
+                                                            <span>Penting</span>
+                                                        </div>
+                                                    </>
                                                 )}
                                                 {thought.is_important === false && (
-                                                    <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full">
-                                                        <CheckCircle2 className="w-3 h-3" />
-                                                        <span>Selesai</span>
-                                                    </div>
+                                                    <>
+                                                        <div className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-slate-100 px-2 py-1 rounded-full">
+                                                            <span>Diluar kendaliku</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full">
+                                                            <CheckCircle2 className="w-3 h-3" />
+                                                            <span>Selesai</span>
+                                                        </div>
+                                                    </>
                                                 )}
                                             </div>
                                         </div>
