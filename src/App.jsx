@@ -98,7 +98,7 @@ function App() {
     )
   }
 
-  const handleThoughtSubmit = async ({ emotion, content }) => {
+  const handleThoughtSubmit = async ({ emotion, content, intensity }) => {
     setProcessing(true)
     try {
       const { data, error } = await supabase
@@ -108,6 +108,7 @@ function App() {
             user_id: session.user.id,
             content,
             emotion,
+            intensity,
           },
         ])
         .select()

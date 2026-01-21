@@ -12,14 +12,35 @@ const EMOTIONS = [
     { id: 'gembira', label: 'Gembira 🤩' },
 ]
 
+const INTENSITY_LABELS = {
+    1: 'Sangat Ringan',
+    2: 'Ringan',
+    3: 'Agak Ringan',
+    4: 'Cukup',
+    5: 'Sedang',
+    6: 'Agak Kuat',
+    7: 'Kuat',
+    8: 'Sangat Kuat',
+    9: 'Intens',
+    10: 'Sangat Intens'
+}
+
 export default function ThoughtForm({ onSubmit, isSubmitting }) {
     const [emotion, setEmotion] = useState('')
     const [content, setContent] = useState('')
+    const [intensity, setIntensity] = useState(5)
 
     const handleSubmit = (e) => {
         e.preventDefault()
         if (!emotion || !content.trim()) return
-        onSubmit({ emotion, content })
+        onSubmit({ emotion, content, intensity })
+    }
+
+    const getIntensityColor = (value) => {
+        if (value <= 3) return 'text-emerald-500'
+        if (value <= 5) return 'text-yellow-500'
+        if (value <= 7) return 'text-orange-500'
+        return 'text-red-500'
     }
 
     return (
@@ -48,6 +69,36 @@ export default function ThoughtForm({ onSubmit, isSubmitting }) {
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                             <ChevronDown className="h-5 w-5" />
                         </div>
+                    </div>
+                </div>
+
+                {/* Intensity Slider */}
+                <div className="space-y-3">
+                    <label className="block text-sm font-medium text-slate-600 uppercase tracking-wider">
+                        Seberapa kuat perasaan ini?
+                    </label>
+                    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs text-slate-400">Ringan</span>
+                            <div className="text-center">
+                                <span className={`text-3xl font-bold ${getIntensityColor(intensity)}`}>
+                                    {intensity}
+                                </span>
+                                <span className="text-slate-400 text-lg">/10</span>
+                            </div>
+                            <span className="text-xs text-slate-400">Intens</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={intensity}
+                            onChange={(e) => setIntensity(parseInt(e.target.value))}
+                            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        />
+                        <p className={`text-center mt-2 text-sm font-medium ${getIntensityColor(intensity)}`}>
+                            {INTENSITY_LABELS[intensity]}
+                        </p>
                     </div>
                 </div>
 
@@ -83,3 +134,4 @@ export default function ThoughtForm({ onSubmit, isSubmitting }) {
         </div>
     )
 }
+
